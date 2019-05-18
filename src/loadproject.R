@@ -64,22 +64,24 @@ pollution_filtered = pollution[,col_names_filter]
 # Assign renamed variable names
 names(pollution_filtered) = col_names_rename
 
-# Normalise and calculate euclidian distance between NOx and IMD, Household poverty and Overcrowding
+# Normalise and calculate euclidian distance between NOx and IMD/Household poverty
 pollution_dist = pollution_filtered  %>%
-        select(LSOA.Code, NOx, IMD, Households.pov, Overcrowded) %>%
-        mutate(sc_nox = scale(NOx), sc_imd = scale(IMD),sc_pov = scale(Households.pov), sc_crowd = scale(Overcrowded)) %>%
-        mutate(dist_imd = sqrt((min(poll_ind$sc_nox) - poll_ind$sc_nox)^2 + 
-                                         (min(poll_ind$sc_imd) - poll_ind$sc_imd)^2)) %>%
-        mutate(dist_pov = sqrt((min(poll_ind$sc_nox) - poll_ind$sc_nox)^2 + 
-                               (min(poll_ind$sc_pov) - poll_ind$sc_pov)^2)) %>%
-        mutate(dist_crowd = sqrt((min(poll_ind$sc_nox) - poll_ind$sc_nox)^2 + 
-                               (min(poll_ind$sc_crowd) - poll_ind$sc_crowd)^2))
+        select(LSOA.Code, NOx, IMD, Households.pov) %>%
+        mutate(sc_nox = scale(NOx), sc_imd = scale(IMD), sc_pov = scale(Households.pov)) %>%
+        mutate(dist_imd = sqrt((min(pollution_dist$sc_nox) - pollution_dist$sc_nox)^2 + 
+                                       (min(pollution_dist$sc_imd) - pollution_dist$sc_imd)^2)) %>%
+        mutate(dist_pov = sqrt((min(pollution_dist$sc_nox) - pollution_dist$sc_nox)^2 + 
+                                       (min(pollution_dist$sc_pov) - pollution_dist$sc_pov)^2)) %>%
+        # Standardise range for each index variable between 0 and 1
+        mutate(dist_imd_01 = pollution_dist$dist_imd/max(pollution_dist$dist_imd)) %>%
+        mutate(dist_pov_01 = pollution_dist$dist_pov/max(pollution_dist$dist_pov))
+
 
 # Exploratory plots
-plot(y = pollution_dist$dist_imd, x = pollution_dist$sc_nox)
+plot(y = pollution_dist$dist_pov, x = pollution_dist$sc_nox)
 # Exploratory 
-hist(pollution_dist$dist_imd, breaks = 50)
-summary(pollution_dist$dist_imd)
+hist(pollution_dist$dist_pov, breaks = 45)
+summary(pollution_dist$dist_pov)
 
 
 # Output relevant dataframes as csv
