@@ -1,18 +1,7 @@
-# Remove recalcitrant R object
-rm(titanic_train)
 
-
-# Load project
-library('ProjectTemplate')
-setwd(file.path('Desktop','DS_Projects','DK_GST_MAY2019'))
-load.project()
-
-
-# Set working directory !! INPUT REQUIRED !!
-wd = file.path('Desktop','DS_Projects','DK_GST_MAY2019')
-# Set data subfolder name !! INPUT REQUIRED !!
-subfolder = 'data'
-# Set file name !! INPUT REQUIRED !!
+# Enter working directory !! INPUT REQUIRED !!
+wd = file.path('Desktop','DK_GST_MAY2019')
+# Enter file name !! INPUT REQUIRED !!
 file_name = 'Pollution Health and Sociodemographic data.csv'
 
 # Ensure the following packages are installed !! INPUT REQUIRED !!
@@ -24,16 +13,12 @@ library(lubridate)
 library(ggplot2)
 library(dplyr)
 
-
+# Distance Computation
+#__________________________________________________________________________________________________
 # Set working directory
-wd = file.path('Desktop','DS_Projects','DK_GST_MAY2019')
 setwd(wd)
-# Set file path to csv file
-path = file.path(subfolder,file_name)
 # Load file
-pollution = read.csv(path)
-
-
+pollution = read.csv(file_name)
 
 # List of interesting variables (URBAN, DIVERSITY, DEPRIVATION)
 col_names_filter = c("LSOA.Code","NOx","PM10","PM2.5",
@@ -64,18 +49,21 @@ pollution_filtered = pollution[,col_names_filter]
 # Assign renamed variable names
 names(pollution_filtered) = col_names_rename
 
-# Normalise and calculate euclidian distance between NOx and IMD/Household poverty
+# Normalise and 
 pollution_dist = pollution_filtered  %>%
         select(LSOA.Code, NOx, IMD, Households.pov) %>%
-        mutate(sc_nox = scale(NOx), sc_imd = scale(IMD), sc_pov = scale(Households.pov)) %>%
+        mutate(sc_nox = scale(NOx), sc_imd = scale(IMD), sc_pov = scale(Households.pov))
+
+# Compute euclidian distance between NOx and IMD/Household poverty
+pollution_dist = pollution_dist %>%
         mutate(dist_imd = sqrt((min(pollution_dist$sc_nox) - pollution_dist$sc_nox)^2 + 
                                        (min(pollution_dist$sc_imd) - pollution_dist$sc_imd)^2)) %>%
         mutate(dist_pov = sqrt((min(pollution_dist$sc_nox) - pollution_dist$sc_nox)^2 + 
-                                       (min(pollution_dist$sc_pov) - pollution_dist$sc_pov)^2)) %>%
-        # Standardise range for each index variable between 0 and 1
+                                       (min(pollution_dist$sc_pov) - pollution_dist$sc_pov)^2))
+# Standardise range for each index variable between 0 and 1
+pollution_dist = pollution_dist %>%
         mutate(dist_imd_01 = pollution_dist$dist_imd/max(pollution_dist$dist_imd)) %>%
-        mutate(dist_pov_01 = pollution_dist$dist_pov/max(pollution_dist$dist_pov))
-
+        mutate(dist_pov_01 = pollution_dist$dist_pov/max(pollution_dist$dist_pov)) 
 
 # Exploratory plots
 plot(y = pollution_dist$dist_pov, x = pollution_dist$sc_nox)
@@ -85,8 +73,8 @@ summary(pollution_dist$dist_pov_01)
 
 
 # Output relevant dataframes as csv
-write.csv(pollution_filtered, file = file.path("data","pollution_filtered.csv"), row.names = FALSE)
-write.csv(pollution_dist, file = file.path("data","pollution_distance.csv"), row.names = FALSE)
+write.csv(pollution_filtered, file = "pollution_filtered.csv", row.names = FALSE)
+write.csv(pollution_dist, file = "pollution_distance.csv", row.names = FALSE)
 
 
 

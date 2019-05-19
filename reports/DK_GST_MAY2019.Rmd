@@ -1,0 +1,106 @@
+---
+title: "Identification of Target Groups for Air Pollution Interventions in Lambeth and Southwark"
+author: "DataKind Data Dive: Guy’s & St Thomas’ Charity"
+date: "19/05/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir= normalizePath('..'))
+knitr::opts_chunk$set(fig.pos = 'H')
+```
+
+## 1.0 Introduction
+
+In addressing the project objective of identifying primary areas of intervention for Guy's and St. Thomas' Charity (GST), we chose an approach which utilised spatial analysis of pollution levels by significantly correlated socio-economic indicator variables. The results of these analyses provide highly-focused insight which should allow efficient allocation of resources in order to best meet the needs of multiple groups within the beneficiary population. 
+
+
+
+## 2.0 Methods
+
+The analysis made use of the \textbf{Pollution Health and Sociodemographic} dataset sourced from the Office of National Statistics (ONS). This dataset provides air pollution and socio-economic indicators by London Super Output Area (LSOA) level. The DataKind Ambassador team further preprocesed the dataset, cleaning and filtering for the boroughs of Southwark and Lambeth.
+
+### 2.1 Variable Selection
+
+The key air pollutants Nitorogen Oxide (NOx), and 2.5 and 10 micron particulates (PM2.5 and PM10) comprised the focus of the analysis. Additionally, of the hundreds of variables included in the dataset, the DataKind Ambassador team identified 22 priority socio-economic indicators. These variables were selected and extracted from the dataset along with the pollution variables. 
+
+Indicators that serve as proxy metrics for classifying URBAN areas:
+**1.	Population aged 0-15
+2.	Population ages 65+
+3.	Population density
+4.	Change in population 2001-2017**
+
+Indicators that serve as proxy metrics for assessing population DIVERSITY:
+**1.	Christian
+2.	People with no religious belief
+3.	Muslim
+4.	White ethnic groups
+5.	Black ethnic groups
+6.	Asian ethnic groups
+7.	Born in EU Accession countries
+8.	Born in non-European countries
+9.	Main language is English**
+
+Indicators that serve as proxy metrics for determining relative levels of DEPRIVATION:
+**1.	Economically inactive
+2.	People with no qualifications
+3.	(People who live in) Overcrowded housing 
+4.	Index of Multiple Deprivation (IMD) 2015: The Index of Multiple Deprivation 2015 is the official measure of relative deprivation for (see guidance note from the government department, MHCLG)
+5.	Households in poverty: This refers to model-based estimates of the proportion of households with mean weekly income lower than 60% of the national median weekly income
+6.	Net annual household income estimate after housing costs
+7.	Youth Unemployment (is based in people aged 18-24 and receiving JSA or Universal Credit)
+8.	Unemployment benefit (people in receipt of Job Seeker’s Allowance aka JSA and Universal Credit)
+9.	Children (dependent children aged under 20) in families in receipt of Income Support/JSA or whose income is <60% of median income**
+
+### 2.2 Correlation Analysis
+Relationships between the variables were assessed using a correlation matrix. This matrix is represented as a heatmap in Figure 1. As demonstrated, the air pollution variables are all highly correlated with each other. Additionally, all three show significant positive correlation with the following socio-economic variables: **Population Density, Asian Ethnicity, *Born in EU Accession countries, Households in poverty**. Unsurprisingly given these findings, pollution levels were also negatively correlated with **Main language is English**.
+
+```{r eda_f01, fig.cap = "Figure 1: Correlation Matrix as Heatmap", fig.pos = "H", out.width='100%', fig.asp=0.75, fig.align='center', echo=FALSE, cache=TRUE}
+# Plot heatmap
+knitr::include_graphics(path = "../graphs/corr_heatmap.png")
+```
+
+Of the correlated variables **Households in Poverty** was selected as the most meaningful with regard to the project objectives. As this variable refers to model-based estimates of the proportion of households with mean weekly income lower than 60 percent of the national median weekly income, it points to potential beneficiaries who would benefit greatly from material intervention - i.e. the poorest areas with the highest pollution.
+
+From the air pollution variables, **NOx** was selected as it displayed the highest variance of the three. It was posited that the higher variance would allow for better spatial visualisation by magnifying the effects on the correlation index. 
+
+
+### 2.3 Distance Index
+In order to spatially represent the poorest areas with corresponding areas of high pollution, a pollution-deprivation index was constructed from the euclidean distance between the **Poverty** and **NOx** variables. The vectors for these variables were first standardised by subtracting each value from the mean and dividing by the standard deviation of the vector. The sum of squared differences for each observation was then computed by the following formula where **N** is the **NOx** vector and **P** is the **Poverty** vector:
+
+$I_i = \sqrt((N_{min} - N_i)^{2} + (P_{min} - P_i)^{2})$
+
+The distance index was then spatially represented in Tableau using the associated LSOA code. A threshold of 0.72 was selected to isolate key areas for intervention. 
+
+
+### 2.4 Reproduciblity
+The processing and analysis of the dataset was conducted in Python. All code is attached and includes instructions on how to run the analysis in the README file. Additionally, the code is annotated with local directory inputs and required packages clearly marked. 
+
+The visualisation was accomplished using the free version of Tableau. This provides the user with an interactive tool from which various levels of the distance index can be selected, and the characteristics of the resulting target LSOAs investigated (eg. by ethnicity or vulnerable institutions). The .twbx (Packaged Workbook) file has been attached and includes the processed data for the analysis. In addition, a version of the workbook is available temporarily online at the Tableau public gallery at the following link:
+
+https://public.tableau.com/profile/kenrick.tan#!/vizhome/GuyandStThomas/Dashboard
+
+## 3.0 Results
+The analysis identified two definitive types of target beneficiaries for intervention by GST. These two target groups would likely require different approaches. 
+
+
+### 3.1 Areas with High Pollution and Deprived Groups
+Spatial analysis of the **NOx**-**Poverty** distance vector allowed identification of primary target areas for material interventions. A tool was constructed in Tableau to allow for easy visualisation of these findings. The resulting Tableau workbook provides GSTK personnel with an interactive tool from which various levels of the distance index can be selected, and the characteristics of the resulting target LSOAs investigated.
+
+A screenshot of the workbook is displayed in Figure 2. As demonstrated, eight LSOAs have been identified as high on the pollution-deprivation index. The visualisation also displays the corresponding schools in the LSOA as well as providing a breakdown of the LSOA population by ethnicity.  
+
+```{r eda_f02, fig.cap = "Figure 2: Pollution-Deprivation Index Analysis", fig.pos = "H", out.width='100%', fig.asp=0.75, fig.align='center', echo=FALSE, cache=TRUE}
+# Plot heatmap
+knitr::include_graphics(path = "../graphs/image_1.jpg")
+```
+
+Table 1 below shows the full list of schools identified as vulnerable institutions in the target LSOAs. These institutions could benefit from material intervention in the form of air purifiers. 
+
+```{r eda_f03, fig.cap = "Table 1: Vulnerable Institutions in Target LSOAs", fig.pos = "H", out.width='40%', fig.asp=0.75, fig.align='center', echo=FALSE, cache=TRUE}
+# Plot heatmap
+knitr::include_graphics(path = "../graphs/image_2.jpg")
+```
+
+### 3.2 Areas with High Pollution and Asian Populations
+Communities with large Asian populations exhibited significant correlation with **NOx** levels. However, these communities were largely confined to more affluent LSOAs. Therefore they do not make ideal candidates for primary material interventions such as provision of air purifiers. Alternative intervention could involve outreach and targeted communications by GST. 
