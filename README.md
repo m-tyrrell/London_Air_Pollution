@@ -1,4 +1,4 @@
-# Identification of Target Groups for Air Pollution Interventions in Lambeth and Southwark
+# Identification of Target Groups for Air Pollution Interventions in Central London
 > DataKind Data Dive: Guy’s & St Thomas’ Charity
 
 The analysis consists of a short script written in Python. This script processess the dataset selecting priority variables and creating index variables based on the L2 distance between NOx and deprivation variables. The script also outputs a visualisation of the correlation matrix. The data were then visualised and further analysed using Tableau.
